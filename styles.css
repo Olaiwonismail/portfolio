@@ -67,7 +67,6 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   position: relative;
-  overflow-x: hidden;
 }
 
 /* Add a very subtle gradient texture to the body for depth */
@@ -746,38 +745,105 @@ img {
   transform: translateY(0);
 }
 
+/* -- Hamburger (hidden on desktop) -- */
+.hamburger {
+  display: none;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 700px) {
   .nav-wrapper {
     top: 0;
-    margin-bottom: -3rem;
-    padding: 0.5rem 0.6rem;
+    margin-bottom: -3.5rem;
+    justify-content: flex-end;
+    padding: 0.75rem 1.2rem;
+  }
+
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transition: all var(--transition);
+    z-index: 110;
+  }
+
+  .hamburger span {
+    display: block;
     width: 100%;
-    box-sizing: border-box;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
   }
 
   .nav {
-    display: flex;
-    gap: 0.1rem;
-    padding: 0.35rem 0.35rem;
-    border-radius: 24px;
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    z-index: 105;
   }
 
-  .nav::-webkit-scrollbar {
-    display: none;
+  .nav.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
 
   .nav-link {
-    font-size: 0.68rem;
-    padding: 0.3rem 0.45rem;
+    font-size: 1.1rem;
+    padding: 0.75rem 1.5rem;
     white-space: nowrap;
-    flex-shrink: 0;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 240px;
+    text-align: center;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    background: rgba(0, 0, 0, 0.06);
   }
 
   .section {
