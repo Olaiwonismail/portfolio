@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. Fade-up Animations with Staggering ---
     const targets = document.querySelectorAll(
-        '.exp-card, .project-card, .edu-card, .about-grid, .hero-text, .hero-photo'
+        '.exp-card, .project-card, .edu-card, .about-grid, .hero-text, .hero-photo, .empty-state'
     );
 
     targets.forEach(el => el.classList.add('fade-up'));
