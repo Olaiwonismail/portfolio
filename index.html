@@ -5,6 +5,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Olaiwon Ismail — Full Stack Engineer</title>
+  <meta name="description"
+    content="Olaiwon Ismail — Backend-focused Full Stack Engineer based in Lagos, Nigeria. Specializing in Python, FastAPI, React, and cloud infrastructure.">
+
+  <!-- Canonical URL (update with your actual domain) -->
+  <link rel="canonical" href="https://olaiwonismail.com/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Olaiwon Ismail — Full Stack Engineer">
+  <meta property="og:description" content="Backend-focused Full Stack Engineer based in Lagos, Nigeria. Specializing in Python, FastAPI, React, and cloud infrastructure.">
+  <meta property="og:url" content="https://olaiwonismail.com/">
+  <meta property="og:image" content="https://olaiwonismail.com/profile.jpg">
+  <meta property="og:site_name" content="Olaiwon Ismail">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Olaiwon Ismail — Full Stack Engineer">
+  <meta name="twitter:description" content="Backend-focused Full Stack Engineer based in Lagos, Nigeria. Specializing in Python, FastAPI, React, and cloud infrastructure.">
+  <meta name="twitter:image" content="https://olaiwonismail.com/profile.jpg">
+
+  <!-- Favicon (replace with your actual favicon files) -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,8 +39,33 @@
     rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
-  <meta name="description"
-    content="Olaiwon Ismail — Backend-focused Full Stack Engineer based in Lagos, Nigeria. Specializing in Python, FastAPI, React, and cloud infrastructure.">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Olaiwon Ismail",
+    "jobTitle": "Full Stack Engineer",
+    "url": "https://olaiwonismail.com",
+    "image": "https://olaiwonismail.com/profile.jpg",
+    "email": "mailto:olaiwonismail@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Lagos",
+      "addressCountry": "NG"
+    },
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "University of Lagos"
+    },
+    "knowsAbout": ["Python", "FastAPI", "React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Docker", "Google Cloud"],
+    "sameAs": [
+      "https://github.com/olaiwonismail",
+      "https://www.linkedin.com/in/ismail-olaiwon-186938324/"
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -27,7 +77,7 @@
       <span></span>
       <span></span>
     </button>
-    <nav class="nav" id="navMenu">
+    <nav class="nav" id="navMenu" aria-label="Main navigation">
       <a href="#about" class="nav-link">About</a>
       <a href="#experience" class="nav-link">Experience</a>
       <a href="#projects" class="nav-link">Projects</a>
@@ -37,6 +87,7 @@
   </div>
 
   <!-- ======== HERO ======== -->
+  <main>
   <header class="hero">
     <div class="container hero-inner">
       <div class="hero-text">
@@ -81,7 +132,7 @@
       </div>
       <div class="hero-photo">
         <div class="photo-frame">
-          <img src="profile.jpg" alt="Olaiwon Ismail">
+          <img src="profile.jpg" alt="Photo of Olaiwon Ismail, Full Stack Engineer based in Lagos, Nigeria" width="280" height="280">
         </div>
       </div>
     </div>
@@ -624,6 +675,7 @@
       </div>
     </div>
   </section>
+  </main>
 
   <!-- ======== FOOTER ======== -->
   <footer class="footer">
@@ -654,7 +706,7 @@
           </svg>
         </a>
       </div>
-      <p class="footer-copy">&copy; 2025 Olaiwon Ismail</p>
+      <p class="footer-copy">&copy; 2025 Olaiwon Ismail. All rights reserved.</p>
     </div>
   </footer>
 
