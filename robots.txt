@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://olaiwonismail.com/sitemap.xml
+Sitemap: https://olaiwon-ismail.vercel.app/sitemap.xml
