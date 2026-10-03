@@ -425,32 +425,6 @@ h3 {
   object-fit: cover;
 }
 
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0 0.8rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--text-2);
-  font-size: 0.8125rem;
-  text-decoration: none;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.links a:hover {
-  color: var(--text);
-  border-color: var(--line-strong);
-}
-
 .stack {
   margin-top: 2rem;
   font-size: 0.875rem;
