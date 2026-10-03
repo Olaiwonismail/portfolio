@@ -1,79 +1,125 @@
-// Scroll-based fade-up animations and Active Navigation
+// Theme toggle, GitHub heatmap and Lagos clock
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. Fade-up Animations with Staggering ---
-    const targets = document.querySelectorAll(
-        '.exp-card, .project-card, .edu-card, .about-grid, .hero-text, .hero-photo, .empty-state'
-    );
+    const root = document.documentElement;
 
-    targets.forEach(el => el.classList.add('fade-up'));
+    // --- 1. Theme toggle --------------------------------------------------
+    const themeToggle = document.getElementById('themeToggle');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const currentTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
 
-    const animationObserver = new IntersectionObserver((entries) => {
-        let delay = 0; // Counter for staggering elements that appear simultaneously
-
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Apply a staggered delay if multiple elements appear at once
-                entry.target.style.transitionDelay = `${delay * 0.15}s`;
-                entry.target.classList.add('visible');
-                animationObserver.unobserve(entry.target);
-
-                delay++;
-                // Reset delay after a short time so later scrolls don't have huge delays
-                setTimeout(() => { delay = 0; }, 100);
-            }
+    if (themeToggle) {
+        const syncLabel = () => {
+            const next = currentTheme() === 'dark' ? 'light' : 'dark';
+            themeToggle.setAttribute('aria-label', `Switch to ${next} theme`);
+            themeToggle.title = `Switch to ${next} theme`;
+        };
+        themeToggle.addEventListener('click', () => {
+            const next = currentTheme() === 'dark' ? 'light' : 'dark';
+            root.dataset.theme = next;
+            try { localStorage.setItem('theme', next); } catch (e) {}
+            syncLabel();
         });
-    }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -40px 0px'
-    });
+        systemDark.addEventListener('change', syncLabel);
+        syncLabel();
+    }
 
-    targets.forEach(el => animationObserver.observe(el));
+    // --- 3. GitHub contribution heatmap -----------------------------------
+    const heatmap = document.getElementById('heatmap');
+    const summary = document.getElementById('activitySummary');
+    const USER = 'olaiwonismail';
 
-    // --- 2. Active Navigation Link Highlighting ---
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.nav-link');
+    if (heatmap && summary) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        const dateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const numberFormat = new Intl.NumberFormat('en-US');
 
-    const navObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Remove active class from all links
-                navLinks.forEach(link => link.classList.remove('active'));
+        fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last`, { signal: controller.signal })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                const days = data.contributions || [];
+                if (!days.length) throw new Error('No data');
 
-                // Add active class to corresponding link
-                const id = entry.target.getAttribute('id');
-                const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
+                // Pad the first column so each column is a Sunday-to-Saturday week
+                const firstWeekday = new Date(`${days[0].date}T00:00:00`).getDay();
+                const cells = [];
+                for (let i = 0; i < firstWeekday; i++) cells.push('<i data-empty></i>');
+                for (const day of days) {
+                    const label = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${dateFormat.format(new Date(`${day.date}T00:00:00`))}`;
+                    cells.push(`<i data-level="${day.level}" title="${label}"></i>`);
+                }
+                heatmap.innerHTML = cells.join('');
+
+                const total = data.total?.lastYear ?? days.reduce((sum, d) => sum + d.count, 0);
+                summary.innerHTML = `${numberFormat.format(total)} contributions in the last year on <a href="https://github.com/${USER}" target="_blank" rel="noopener">GitHub</a>.`;
+                heatmap.setAttribute('aria-label', `GitHub contribution heatmap: ${numberFormat.format(total)} contributions in the last year`);
+
+                // Start scrolled to the most recent weeks on narrow screens
+                const scroller = heatmap.parentElement;
+                scroller.scrollLeft = scroller.scrollWidth;
+            })
+            .catch(() => {
+                summary.innerHTML = `Couldn’t load contributions right now. They’re on <a href="https://github.com/${USER}" target="_blank" rel="noopener">GitHub</a>.`;
+                heatmap.parentElement.hidden = true;
+                const legend = document.querySelector('.heatmap-legend');
+                if (legend) legend.hidden = true;
+            })
+            .finally(() => clearTimeout(timeout));
+    }
+
+    // --- 4. Local time in Lagos --------------------------------------------
+    const lagosTime = document.getElementById('lagosTime');
+    if (lagosTime && window.Intl) {
+        const timeFormat = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit' });
+        const tick = () => { lagosTime.textContent = `${timeFormat.format(new Date())} in Lagos (WAT)`; };
+        tick();
+        setInterval(tick, 30000);
+    }
+
+    // --- 5. Sidebar: highlight the section in view -------------------------
+    const sideLinks = Array.from(document.querySelectorAll('.side-link'));
+    const sideTargets = sideLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+    if (sideLinks.length) {
+        let clicked = null;   // keep a clicked link active until the user scrolls by hand
+        ['wheel', 'touchstart', 'keydown'].forEach(type =>
+            window.addEventListener(type, () => { clicked = null; }, { passive: true }));
+
+        const update = () => {
+            let current = clicked;
+            if (!current) {
+                const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+                current = atBottom ? sideTargets[sideTargets.length - 1] : sideTargets[0];
+                if (!atBottom) {
+                    for (const target of sideTargets) {
+                        if (target.getBoundingClientRect().top <= window.innerHeight * 0.35) current = target;
+                    }
                 }
             }
-        });
-    }, {
-        // Trigger point is near the vertical middle of the screen
-        rootMargin: '-40% 0px -40% 0px'
-    });
-
-    sections.forEach(section => navObserver.observe(section));
-
-    // --- 3. Hamburger Menu Toggle ---
-    const hamburger = document.getElementById('menuToggle');
-    const navMenu = document.getElementById('navMenu');
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            const isOpen = navMenu.classList.toggle('open');
-            hamburger.classList.toggle('active');
-            hamburger.setAttribute('aria-expanded', isOpen);
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-        });
-
-        // Close menu when a nav link is clicked
-        navMenu.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('open');
-                hamburger.classList.remove('active');
-                hamburger.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
+            sideLinks.forEach(link => {
+                if (link.getAttribute('href') === `#${current.id}`) link.setAttribute('aria-current', 'true');
+                else link.removeAttribute('aria-current');
             });
-        });
+        };
+
+        sideLinks.forEach(link => link.addEventListener('click', () => {
+            clicked = document.querySelector(link.getAttribute('href'));
+            update();
+        }));
+
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => { update(); ticking = false; });
+        }, { passive: true });
+        update();
     }
+
+    // --- 6. Footer year -------------------------------------------------------
+    const year = document.getElementById('year');
+    if (year) year.textContent = new Date().getFullYear();
 });
