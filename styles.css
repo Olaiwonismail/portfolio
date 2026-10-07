@@ -149,16 +149,29 @@ summary {
 }
 
 a {
+  --ink-start: 0%;
+  --ink-length: 100%;
+  --track: var(--line-strong);
   color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-  transition: text-decoration-color 0.15s ease, color 0.15s ease;
+  text-decoration: none;
 }
 
-a:hover {
-  text-decoration-color: currentColor;
+/* Underline drawn as two background lines: a faint track, and an ink line
+   that grows over it from the left on hover. Hovering out retracts it. */
+a:not([class]),
+a.org {
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(var(--track), var(--track));
+  background-repeat: no-repeat;
+  background-position: var(--ink-start) 100%, var(--ink-start) 100%;
+  background-size: 0% 1px, var(--ink-length) 1px;
+  transition: background-size 0.45s cubic-bezier(0.65, 0, 0.35, 1), color 0.15s ease;
+}
+
+a:not([class]):hover,
+a.org:hover {
+  background-size: var(--ink-length) 1px, var(--ink-length) 1px;
 }
 
 :focus-visible {
@@ -445,13 +458,15 @@ h3 {
 
 /* Organisation link with its logo inline, like a name tag */
 .org {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.3em;
+  /* Skip the logo so only the name is underlined. */
+  --ink-start: 1.3em;
+  --ink-length: calc(100% - 1.3em);
   white-space: nowrap;
 }
 
 .org img {
+  display: inline-block;
+  margin-right: 0.3em;
   position: relative;
   top: 0.15em;
   width: 1em;
@@ -565,11 +580,7 @@ h3 {
 }
 
 .project h3 a {
-  text-decoration: none;
-}
-
-.project h3 a:hover {
-  text-decoration: underline;
+  --track: transparent;
 }
 
 .project p {
@@ -702,11 +713,7 @@ details.row {
 }
 
 .row-title a {
-  text-decoration: none;
-}
-
-.row-title a:hover {
-  text-decoration: underline;
+  --track: transparent;
 }
 
 .row-org {
