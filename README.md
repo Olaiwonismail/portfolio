@@ -1,4 +1,4 @@
-# 🌐 Olaiwon Ismail — Portfolio
+# 🌐 Ismail Olaiwon — Portfolio
 
 Personal portfolio website showcasing my work as a **Backend-Focused Full Stack Engineer** based in Lagos, Nigeria.
 
@@ -55,4 +55,4 @@ npx -y http-server . -p 8080
 
 ---
 
-<p align="center">© 2025 Olaiwon Ismail</p>
+<p align="center">© 2025 Ismail Olaiwon</p>
