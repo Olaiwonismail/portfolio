@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. GitHub contribution heatmap -----------------------------------
     const heatmap = document.getElementById('heatmap');
     const summary = document.getElementById('activitySummary');
+    const streak = document.getElementById('activityStreak');
     const USER = 'olaiwonismail';
 
     if (heatmap && summary) {
@@ -33,6 +34,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeout = setTimeout(() => controller.abort(), 8000);
         const dateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         const numberFormat = new Intl.NumberFormat('en-US');
+        const githubLink = () => {
+            const link = document.createElement('a');
+            link.href = `https://github.com/${USER}`;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = 'GitHub';
+            return link;
+        };
+        const setSummary = lead => {
+            summary.replaceChildren(document.createTextNode(lead), githubLink(), document.createTextNode('.'));
+        };
 
         fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last`, { signal: controller.signal })
             .then(res => {
@@ -45,25 +57,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Pad the first column so each column is a Sunday-to-Saturday week
                 const firstWeekday = new Date(`${days[0].date}T00:00:00`).getDay();
-                const cells = [];
-                for (let i = 0; i < firstWeekday; i++) cells.push('<i data-empty></i>');
-                for (const day of days) {
-                    const label = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${dateFormat.format(new Date(`${day.date}T00:00:00`))}`;
-                    cells.push(`<i data-level="${day.level}" title="${label}"></i>`);
+                const cells = document.createDocumentFragment();
+                for (let i = 0; i < firstWeekday; i++) {
+                    const pad = document.createElement('i');
+                    pad.dataset.empty = '';
+                    cells.append(pad);
                 }
-                heatmap.innerHTML = cells.join('');
+                for (const day of days) {
+                    const cell = document.createElement('i');
+                    cell.dataset.level = day.level;
+                    cell.title = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${dateFormat.format(new Date(`${day.date}T00:00:00`))}`;
+                    cells.append(cell);
+                }
+                heatmap.replaceChildren(cells);
 
                 const total = data.total?.lastYear ?? days.reduce((sum, d) => sum + d.count, 0);
-                summary.innerHTML = `${numberFormat.format(total)} contributions in the last year on <a href="https://github.com/${USER}" target="_blank" rel="noopener">GitHub</a>.`;
+                setSummary(`${numberFormat.format(total)} contributions in the last year on `);
                 heatmap.setAttribute('aria-label', `GitHub contribution heatmap: ${numberFormat.format(total)} contributions in the last year`);
+
+                // Longest run of consecutive days with at least one contribution
+                let run = 0;
+                let longest = 0;
+                for (const day of days) {
+                    run = day.count > 0 ? run + 1 : 0;
+                    if (run > longest) longest = run;
+                }
+                if (longest > 1 && streak) {
+                    streak.textContent = `Longest streak: ${longest} days`;
+                }
 
                 // Start scrolled to the most recent weeks on narrow screens
                 const scroller = heatmap.parentElement;
                 scroller.scrollLeft = scroller.scrollWidth;
             })
             .catch(() => {
-                summary.innerHTML = `Couldn’t load contributions right now. They’re on <a href="https://github.com/${USER}" target="_blank" rel="noopener">GitHub</a>.`;
+                setSummary('Couldn’t load contributions right now. They’re on ');
                 heatmap.parentElement.hidden = true;
+                if (streak) streak.hidden = true;
                 const legend = document.querySelector('.heatmap-legend');
                 if (legend) legend.hidden = true;
             })
@@ -100,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             sideLinks.forEach(link => {
-                if (link.getAttribute('href') === `#${current.id}`) link.setAttribute('aria-current', 'true');
+                if (link.getAttribute('href') === `#${current.id}`) link.setAttribute('aria-current', 'location');
                 else link.removeAttribute('aria-current');
             });
         };

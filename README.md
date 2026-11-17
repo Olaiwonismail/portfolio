@@ -1,40 +1,56 @@
-# 🌐 Ismail Olaiwon — Portfolio
+# Ismail Olaiwon — Portfolio
 
-Personal portfolio website showcasing my work as a **Backend-Focused Full Stack Engineer** based in Lagos, Nigeria.
+Personal portfolio for Ismail Olaiwon, a backend-focused full stack engineer in Lagos, Nigeria.
 
-**🔗 [View Live →](#)** <!-- Replace # with your deployed URL -->
+Live site: <https://olaiwon-ismail.vercel.app/>
 
----
+## What's on the page
 
-## ✨ Features
+| Section | What it holds |
+|---|---|
+| **About** | Intro, and the stack with brand icons |
+| **Projects** | Six builds, each linked to its source |
+| **Open source** | Pull requests merged into other people's projects |
+| **Writing** | Notes on the backend work |
+| **Experience** | Roles and education |
+| **Activity** | A year of GitHub contributions |
 
-- **Single-page layout** — Clean, scrollable sections for About, Experience, Projects, and Education
-- **Responsive design** — Optimized for desktop and mobile devices
-- **Smooth animations** — Scroll-triggered fade-up effects with staggered timing
-- **Active nav tracking** — Navigation highlights the current section as you scroll
-- **Official brand icons** — Technology tags use authentic SVG logos from [Simple Icons](https://simpleicons.org/)
+## Features
 
-## 🛠 Tech Stack
+- Static HTML, CSS and vanilla JavaScript. No framework, no runtime dependencies, and no build step needed to deploy.
+- Light and dark themes, with the choice remembered.
+- Brand icons for the stack, inlined as an SVG sprite so they tint with the theme instead of being flat images.
+- A year of GitHub contributions, fetched at runtime and degrading quietly if the request fails.
+- Keyboard accessible throughout, with visible focus, a skip link and no scroll-linked animation.
 
-| Layer | Technologies |
-|-------|-------------|
-| **Structure** | HTML5, Semantic Markup |
-| **Styling** | Vanilla CSS, CSS Variables, Responsive Media Queries |
-| **Interactivity** | Vanilla JavaScript, IntersectionObserver API |
-| **Typography** | [Inter](https://fonts.google.com/specimen/Inter) + [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif) |
+## Tech
 
-## 📂 Project Structure
+| Layer | |
+|---|---|
+| **Structure** | HTML5, semantic markup, ARIA where it helps |
+| **Styling** | Vanilla CSS, custom properties, media queries |
+| **Interactivity** | Vanilla JavaScript, rAF-throttled scroll handling |
+| **Typography** | [Libron](https://fonts.google.com/specimen/Libron) and [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono), self-hosted as woff2 |
+| **Icons** | [Simple Icons](https://simpleicons.org/), inlined as an SVG sprite |
+
+## Project structure
 
 ```
 portfolio/
-├── index.html      # Main page with all sections
-├── styles.css      # Design system, components, and responsive styles
-├── script.js       # Scroll animations and active nav highlighting
-├── profile.jpg     # Profile photo
-└── README.md
+├── index.html        # the page
+├── styles.css        # design system, components, responsive styles
+├── script.js         # theme, heatmap, clock, active nav tracking
+├── fonts/            # self-hosted woff2 files
+├── images/           # project screenshots, logos
+├── profile.jpg       # used for social previews
+└── sitemap.xml
 ```
 
-## 🚀 Run Locally
+## Writing a post
+
+The Writing section on the page is in place and waiting. To publish something, add a row to the list in `index.html` and write the post as its own page, following the structure of the page itself.
+
+## Run locally
 
 ```bash
 # Clone the repo
@@ -47,12 +63,8 @@ npx -y http-server . -p 8080
 # Open http://localhost:8080
 ```
 
-## 📬 Contact
+## Contact
 
 - **Email:** [olaiwonismail@gmail.com](mailto:olaiwonismail@gmail.com)
 - **GitHub:** [github.com/olaiwonismail](https://github.com/olaiwonismail)
 - **LinkedIn:** [linkedin.com/in/olaiwonismail](https://www.linkedin.com/in/ismail-olaiwon-186938324/)
-
----
-
-<p align="center">© 2025 Ismail Olaiwon</p>
