@@ -11,7 +11,7 @@ Live site: <https://olaiwon-ismail.vercel.app/>
 | **About** | Intro, and the stack with brand icons |
 | **Projects** | Six builds, each linked to its source |
 | **Open source** | Pull requests merged into other people's projects |
-| **Writing** | Notes on the backend work |
+| **Writing** | Posts on the backend work |
 | **Experience** | Roles and education |
 | **Activity** | A year of GitHub contributions |
 
@@ -40,6 +40,7 @@ portfolio/
 ├── index.html        # the page
 ├── styles.css        # design system, components, responsive styles
 ├── script.js         # theme, heatmap, clock, active nav tracking
+├── posts/            # one html file per post
 ├── fonts/            # self-hosted woff2 files
 ├── images/           # project screenshots, logos
 ├── profile.jpg       # used for social previews
@@ -48,7 +49,14 @@ portfolio/
 
 ## Writing a post
 
-The Writing section on the page is in place and waiting. To publish something, add a row to the list in `index.html` and write the post as its own page, following the structure of the page itself.
+Posts are plain HTML pages in `posts/`, built from the same shell as `index.html`. To publish one:
+
+1. Copy `posts/2026-11-17-building-a-spotify-mcp-server.html` to `posts/YYYY-MM-DD-slug.html` and replace the `<article class="prose">` contents: the `post-meta` line, the `h1`, the `post-lede`, then the body in `h2`/`p`/`ul`/`pre` elements.
+2. In the copy, everything in `<head>` and the `<header>`, `<aside>` and `<footer>` blocks already uses `../` paths — leave those alone.
+3. Add a `.post-row` to the `.post-list` in the Writing section of `index.html`, keeping the newest first.
+4. Add the new URL to `sitemap.xml`.
+
+The prose styles (`.prose`) live in `styles.css`, so body elements need no inline styling.
 
 ## Run locally
 

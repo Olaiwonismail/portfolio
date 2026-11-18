@@ -111,9 +111,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 5. Sidebar: highlight the section in view -------------------------
     const sideLinks = Array.from(document.querySelectorAll('.side-link'));
-    const sideTargets = sideLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+    // On a post page these links point back at ../index.html#section, which is
+    // not a selector. Only same-page links have a target to track.
+    const samePageTarget = link => {
+        const href = link.getAttribute('href');
+        if (!href || !href.startsWith('#')) return null;
+        try { return document.querySelector(href); } catch (e) { return null; }
+    };
+    const sideTargets = sideLinks.map(samePageTarget).filter(Boolean);
 
-    if (sideLinks.length) {
+    if (sideTargets.length) {
         let clicked = null;   // keep a clicked link active until the user scrolls by hand
         ['wheel', 'touchstart', 'keydown'].forEach(type =>
             window.addEventListener(type, () => { clicked = null; }, { passive: true }));
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         sideLinks.forEach(link => link.addEventListener('click', () => {
-            clicked = document.querySelector(link.getAttribute('href'));
+            clicked = samePageTarget(link);
             update();
         }));
 

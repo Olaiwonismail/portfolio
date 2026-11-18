@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building a Spotify MCP Server — Ismail Olaiwon</title>
+  <meta name="description" content="Think of MCP as a toolbox for AI agents. Building a Spotify MCP server from scratch: app setup, OAuth with PKCE, tool definitions, and getting an agent to chain them together.">
+  <meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+
+  <!-- Apply saved theme before first paint -->
+  <script>
+    try {
+      var savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light' || savedTheme === 'dark') document.documentElement.dataset.theme = savedTheme;
+    } catch (e) {}
+  </script>
+
+  <link rel="canonical" href="https://olaiwon-ismail.vercel.app/posts/2026-11-17-building-a-spotify-mcp-server.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Building a Spotify MCP Server: From API to AI Agent">
+  <meta property="og:description" content="Think of MCP as a toolbox for AI agents. A walk through building a Spotify MCP server: OAuth with PKCE, tool definitions, and agents that chain them.">
+  <meta property="og:url" content="https://olaiwon-ismail.vercel.app/posts/2026-11-17-building-a-spotify-mcp-server.html">
+  <meta property="og:image" content="https://olaiwon-ismail.vercel.app/profile.jpg">
+  <meta property="og:site_name" content="Ismail Olaiwon">
+  <meta property="og:locale" content="en_US">
+  <meta property="article:published_time" content="2026-11-17">
+  <meta property="article:author" content="Ismail Olaiwon">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Building a Spotify MCP Server: From API to AI Agent">
+  <meta name="twitter:description" content="Think of MCP as a toolbox for AI agents. A walk through building a Spotify MCP server: OAuth with PKCE, tool definitions, and agents that chain them.">
+  <meta name="twitter:image" content="https://olaiwon-ismail.vercel.app/profile.jpg">
+
+  <link rel="icon" href="data:,">
+  <link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
+
+  <link rel="preload" href="../fonts/Libron-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Libron-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/JetBrainsMono.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="column header-row">
+      <a class="identity" href="../index.html">
+        <span>
+          <span class="identity-name">Ismail Olaiwon</span>
+          <span class="identity-role">Backend engineer, Lagos</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#open-source">Open source</a>
+        <a href="../index.html#writing">Writing</a>
+        <a href="../index.html#experience">Experience</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+        <span class="swatch" aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar: wide screens only -->
+  <aside class="sidebar" aria-label="Sections and links">
+    <nav class="side-nav" aria-label="Sections">
+      <a href="../index.html#top" class="side-link">About</a>
+      <a href="../index.html#projects" class="side-link">Projects</a>
+      <a href="../index.html#open-source" class="side-link">Open source</a>
+      <a href="../index.html#writing" class="side-link" aria-current="location">Writing</a>
+      <a href="../index.html#experience" class="side-link">Experience</a>
+    </nav>
+    <hr class="side-rule">
+    <ul class="side-social" role="list">
+      <li><a href="https://www.linkedin.com/in/ismail-olaiwon-186938324/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V16M8 7.75v.01M11.5 16v-3.25a2.25 2.25 0 0 1 4.5 0V16M11.5 10.5V16"/></svg>
+      </a></li>
+      <li><a href="https://github.com/olaiwonismail" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+      </a></li>
+      <li><a href="mailto:olaiwonismail@gmail.com" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>
+      </a></li>
+    </ul>
+    <p class="status"><span class="status-dot" aria-hidden="true"></span>Open to work</p>
+  </aside>
+
+  <main id="main" class="column">
+    <article class="prose">
+      <p class="post-meta"><time datetime="2026-11-17">17 Nov 2026</time> <span aria-hidden="true">·</span> 10 min read</p>
+      <h1>Building a Spotify MCP Server: From API to AI Agent</h1>
+      <p class="post-lede">If you’re new to MCPs, just need a refresher, or are simply curious about how they work, this guide is for you.</p>
+
+      <h2>So, what’s MCP?</h2>
+
+      <p>Think of MCP as a toolbox for AI agents.</p>
+
+      <p>Basically, MCP (Model Context Protocol) is a standardized interface that allows AI agents to interact with external services like APIs, databases and other tools.</p>
+
+      <p>Now, technically, an AI agent can call APIs directly. It doesn’t necessarily need MCP to do that. But here’s the thing: rather than having to figure out API endpoints, construct requests and understand different response formats every time, you can expose these operations through an MCP server.</p>
+
+      <p>Think about it like this. Imagine you’re a carpenter. Rather than going to the shed every time you need a tool, you have a toolbox containing the tools you need. That’s essentially what MCP provides for AI agents.</p>
+
+      <p>For example, take Spotify. Spotify already has a Web API, so technically, an AI agent can interact with Spotify directly through its API. But with an MCP server, we can expose Spotify’s functionality as a collection of tools that the agent can discover and use.</p>
+
+      <p>So instead of figuring out which endpoint to call, the agent can simply use a tool like <code>search_tracks</code> or <code>create_playlist</code>.</p>
+
+      <p>And there’s another advantage here. An agent can hallucinate API endpoints or parameters when working directly with APIs. With MCP, we give it predefined tools, descriptions and input schemas. This doesn’t completely eliminate hallucinations, but it makes interactions more structured and predictable.</p>
+
+      <p>That’s the basic idea.</p>
+
+      <p>Now, what I want to do here is build a simple Spotify MCP server. Nothing too complicated. Just an MVP that covers some of the things we’ll be going through: authentication, API calls, tool definitions and, importantly, how an AI agent can combine different tools to achieve a goal.</p>
+
+      <p>I don’t think we’ll be covering much about tool calling itself, because that’s largely handled by the MCP client and the agent. But we’ll see how everything fits together.</p>
+
+      <p>Alright, I’ve opened the Spotify Developer Dashboard. Let’s get straight to the main thing.</p>
+
+      <h2>1. Setting up Spotify</h2>
+
+      <p>Spotify is primarily an API-based service, and it provides a developer dashboard where you can create applications.</p>
+
+      <p>So, from the Spotify Developer Dashboard, you can create an app. Each app comes with its own credentials, mainly a Client ID and Client Secret.</p>
+
+      <p>These credentials identify your application when making requests to Spotify.</p>
+
+      <p>That’s basically the initial setup. Nothing particularly complicated here.</p>
+
+      <p>Now that we have that out of the way, let’s move on to authentication.</p>
+
+      <h2>2. Authentication: Getting an Access Token</h2>
+
+      <p>How do you actually call Spotify’s APIs?</p>
+
+      <p>You can’t just pick an endpoint and start making requests. Spotify needs to verify that your application is authorized to access the resources you’re requesting.</p>
+
+      <p>This is where OAuth comes in.</p>
+
+      <p>Spotify supports different authorization flows, depending on the kind of application you’re building and what you’re trying to achieve.</p>
+
+      <p>For this project, we’ll be using the Authorization Code with PKCE flow.</p>
+
+      <p>PKCE stands for Proof Key for Code Exchange. It’s an extension to OAuth 2.0 that makes the authorization process safer, particularly for applications that cannot securely store a client secret.</p>
+
+      <p>Now, PKCE is something that took me a while to understand properly. It can be a little obscure when you’re first encountering it, so I don’t want to spend too much time on it here.</p>
+
+      <p>I’ll probably drop a separate article explaining PKCE entirely, because I think it deserves its own walkthrough.</p>
+
+      <p>For now, let’s focus on what we actually need: getting an access token.</p>
+
+      <p>The general process is pretty straightforward.</p>
+
+      <p>First, we initiate the authorization process. Our application generates a code verifier and a code challenge, then redirects the user to Spotify’s authorization page.</p>
+
+      <p>The user signs in, grants the requested permissions, and Spotify redirects them back to our application with an authorization code.</p>
+
+      <p>We then exchange that authorization code, alongside our original code verifier, for an access token.</p>
+
+      <p>And that’s pretty much what we need for now.</p>
+
+      <p>There’s also something called scopes. Basically, scopes determine what permissions our application is requesting from the user.</p>
+
+      <p>For example, if we want to access a user’s playlists or create playlists on their behalf, we’ll need to request the appropriate scopes.</p>
+
+      <p>We shouldn’t just request every available permission. We’ll request the ones relevant to the tools we’re exposing.</p>
+
+      <p>Once we have our access token, we need to store it somewhere.</p>
+
+      <p>For local development, something like a <code>token.json</code> file should be sufficient.</p>
+
+      <p>If we’re running this in production, the setup will be slightly different. We’d need to consider more secure credential storage and token management.</p>
+
+      <p>But I think we’ve covered enough authentication for this article. I’ll stop at obtaining and saving the access token for now. We can handle refresh tokens and the other authentication-related stuff separately.</p>
+
+      <p>I don’t want to go too far off-topic.</p>
+
+      <h2>3. Structuring the Project</h2>
+
+      <p>Alright, so we’ve handled the initial setup and authentication. What’s next?</p>
+
+      <p>I’m thinking about how I want the project structured.</p>
+
+      <p>One thing I want to achieve is making this a proper installable package rather than just another Python script sitting in a repository.</p>
+
+      <p>So, I want the entry point to be through the CLI.</p>
+
+      <p>We’ll use Typer, by Tiangolo, to handle the command-line interface.</p>
+
+      <p>If you’ve used Typer before, you probably know it’s relatively straightforward to set up.</p>
+
+      <p>The idea is that users shouldn’t have to manually configure everything or run different Python files to get the server working.</p>
+
+      <p>Ideally, you should be able to run something like:</p>
+
+      <pre><code class="language-bash">spotify-music-mcp connect</code></pre>
+
+      <p>And the application handles the rest.</p>
+
+      <p>Let’s break down what that process would look like.</p>
+
+      <h2>4. Building the CLI and Authentication Flow</h2>
+
+      <p>When you run <code>spotify-music-mcp connect</code>, the first thing we need to handle is authentication.</p>
+
+      <p>We can redirect the user to their browser, where they’ll complete the Spotify OAuth process.</p>
+
+      <p>Once authentication is successful, we receive the access token and save it locally.</p>
+
+      <p>We also need to think about users who don’t necessarily want to authenticate immediately.</p>
+
+      <p>For example, someone might just want to install the package and add it to their AI agent’s configuration first.</p>
+
+      <p>So, authentication shouldn’t necessarily be compulsory during the initial setup.</p>
+
+      <p>We can provide a separate command for authentication, something like:</p>
+
+      <pre><code class="language-bash">spotify-music-mcp auth login</code></pre>
+
+      <p>And another command to clear the saved credentials and start the authentication process again.</p>
+
+      <p>Basically, I want the whole experience to be as simple as possible.</p>
+
+      <p>You install the package, configure it, authenticate when necessary, and connect it to your agent.</p>
+
+      <p>We can also handle the actual server startup through the CLI.</p>
+
+      <p>That’s the general idea.</p>
+
+      <h2>5. Defining the MCP Tools</h2>
+
+      <p>Now, let’s get to the actual MCP implementation.</p>
+
+      <p>Remember, the whole point of this project is to expose Spotify’s API functionality to an AI agent.</p>
+
+      <p>So, essentially, we’re taking Spotify API operations and making them available as MCP tools.</p>
+
+      <p>Think of each tool as a function the AI agent can discover and call.</p>
+
+      <p>For example, we could have a <code>search_tracks</code> tool.</p>
+
+      <p>This tool would accept a search query and perhaps a limit parameter. When the agent invokes it, our server takes those parameters, makes the appropriate request to Spotify’s API and returns the results.</p>
+
+      <p>We could also have tools for retrieving artist information, searching albums, accessing playlists and creating new playlists.</p>
+
+      <p>Each tool needs a few things:</p>
+
+      <ul>
+        <li>A name.</li>
+        <li>A description explaining what it does.</li>
+        <li>The parameters it accepts.</li>
+        <li>The appropriate input types and validation.</li>
+        <li>A structured response.</li>
+      </ul>
+
+      <p>The descriptions are particularly important because they’re what help the AI agent understand what each tool does and when to use it.</p>
+
+      <p>Now, I don’t think it’s particularly useful to manually type out every single tool definition in this walkthrough. It can get boring pretty quickly.</p>
+
+      <p>The implementation is mostly about connecting the different Spotify API operations to the MCP tool definitions.</p>
+
+      <p>You define the tools, specify their input schemas, provide descriptions and map them to the functions responsible for making the actual API calls.</p>
+
+      <p>So, when an agent calls a tool, the MCP server receives the request, validates the parameters, executes the corresponding function and returns a formatted response.</p>
+
+      <p>That’s essentially the core of the MCP server.</p>
+
+      <h2>6. Making the Agent Combine Different Tools</h2>
+
+      <p>There’s another thing I want to touch on here, and that’s the ability of AI agents to combine different tools to achieve a goal.</p>
+
+      <p>Because, really, having an agent call one tool at a time isn’t particularly interesting.</p>
+
+      <p>Let’s take an example.</p>
+
+      <p>Imagine you ask your AI agent:</p>
+
+      <blockquote>
+        <p>“Create a playlist containing songs from my recently played music.”</p>
+      </blockquote>
+
+      <p>How does it achieve that?</p>
+
+      <p>Well, it could first call a tool to retrieve your recently played tracks.</p>
+
+      <p>Then, it collects the results and calls another tool to create a playlist.</p>
+
+      <p>Finally, it calls another tool to add those tracks to the newly created playlist.</p>
+
+      <p>So, we’ve got different tools performing different operations, but the agent is able to combine them to achieve one objective.</p>
+
+      <p>That’s what makes tool use interesting.</p>
+
+      <p>Rather than writing one massive function for every possible task, we expose smaller, reusable tools that the agent can combine depending on what the user wants.</p>
+
+      <p>Of course, some operations will require additional permissions, and actions that modify a user’s Spotify account should have appropriate safeguards.</p>
+
+      <p>But you get the idea.</p>
+
+      <h2>7. Packaging and Publishing</h2>
+
+      <p>Now, remember I mentioned earlier that I want this project to be an installable package?</p>
+
+      <p>That’s another thing we need to work towards.</p>
+
+      <p>I don’t want users to clone the repository, manually install dependencies and start figuring out how everything works.</p>
+
+      <p>The goal is installation ease.</p>
+
+      <p>So, the first thing we’ll need to do is package the project properly.</p>
+
+      <p>We’ll build the distribution files and publish the package to PyPI.</p>
+
+      <p>Once it’s published, users can install and run it using tools like <code>pipx</code> or <code>uvx</code>.</p>
+
+      <p>We could also provide an NPX version.</p>
+
+      <p>Now, this doesn’t mean we’re rewriting the entire project in JavaScript.</p>
+
+      <p>We can simply publish a small NPM wrapper around the Python package that launches it.</p>
+
+      <p>That way, someone who’s more comfortable with the Node.js ecosystem can use NPX to run the server without having to manually clone the repository.</p>
+
+      <p>It’s an optional addition, but I think it’s a nice way to make the project more accessible.</p>
+
+      <p>And that’s pretty much it for the initial implementation.</p>
+
+      <h2>8. What’s Next?</h2>
+
+      <p>So, we’ve gone through the basic process of creating our own MCP server.</p>
+
+      <p>We’ve covered setting up the Spotify application, authentication, obtaining an access token, defining tools, structuring the project and packaging it for distribution.</p>
+
+      <p>But there’s still quite a lot we can explore.</p>
+
+      <p>For example, we could take this a step further and make the server remote.</p>
+
+      <p>Rather than having users install the package locally, we could host the MCP server and allow agents to connect through an HTTP URL.</p>
+
+      <p>That introduces another interesting aspect of MCP, which is remote connectivity.</p>
+
+      <p>We could also build something around browser automation.</p>
+
+      <p>For example, imagine creating an MCP server for browser-use functionality, allowing AI agents in tools like Gemini or OpenCode to interact with a browser through a standardized interface.</p>
+
+      <p>That’s another project I’d like to explore.</p>
+
+      <p>So, yeah, that’s pretty much where we’re going with this.</p>
+
+      <p>I’ll link the repository below so you can follow the actual implementation. I’ll also include the separate PKCE article when it’s ready.</p>
+
+      <p>For now, this should give you a basic understanding of how to build an MCP server around an existing API and make it accessible to AI agents.</p>
+
+      <p><strong>Repository:</strong> <a href="https://github.com/Olaiwonismail/spotify-mcp" target="_blank" rel="noopener">github.com/Olaiwonismail/spotify-mcp</a></p>
+
+      <p class="post-back"><a href="../index.html#writing">All writing</a></p>
+    </article>
+  </main>
+
+  <footer class="site-footer column">
+    <p>Say hello at <a href="mailto:olaiwonismail@gmail.com">olaiwonismail@gmail.com</a>, or find me on
+      <a href="https://github.com/olaiwonismail" target="_blank" rel="noopener">GitHub</a> and
+      <a href="https://www.linkedin.com/in/ismail-olaiwon-186938324/" target="_blank" rel="noopener">LinkedIn</a>.</p>
+    <p class="footer-meta"><span id="lagosTime" class="mono">Lagos, WAT (UTC+1)</span> <span>&copy; <span id="year">2026</span> Ismail Olaiwon</span></p>
+  </footer>
+
+  <script src="../script.js"></script>
+</body>
+
+</html>
